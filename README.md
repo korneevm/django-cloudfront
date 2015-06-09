@@ -6,10 +6,16 @@ Installation:
     pip install django-cloudfront
 
 
-Usage:
+Usage with files:
 
     import cloudfront
     cloudfront.sign(url, secs)
+
+
+Usage for content streaming:
+
+    import cloudfront
+    response = cloudfront.set_signed_cookies(response, url, secs)
 
 
 Add these two settings in settings.py
