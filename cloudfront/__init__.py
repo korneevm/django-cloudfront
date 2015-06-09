@@ -45,12 +45,19 @@ def _create_url(url, encoded_signature, key_pair_id, expires):
     return url + '?' + params
 
 
-def _get_canned_policy_url(url, priv_key_string, key_pair_id, expires):
+def _get_canned_policy(url, priv_key_string, expires):
     canned_policy = '{"Statement":[{"Resource":"%(url)s","Condition":{"DateLessThan":{"AWS:EpochTime":%(expires)s}}}]}' % {'url': url, 'expires': expires}
 
     signature = _get_signature(canned_policy, priv_key_string)
 
     encoded_signature = _base64_encode(signature)
+
+    return encoded_signature
+
+
+def _get_canned_policy_url(url, priv_key_string, key_pair_id, expires):
+
+    encoded_signature = _get_canned_policy(url, priv_key_string, expires)
 
     signed_url = _create_url(url, encoded_signature, key_pair_id, expires)
 
@@ -82,3 +89,32 @@ def sign(resource, secs=10):
     # print(enc_url)
 
     return signed_url
+
+# http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-setting-signed-cookie-canned-policy.html
+def set_signed_cookies(response, resource, secs=3600):
+    expires = int(time.time()) + secs
+
+    if not PRIVATE_KEY or not KEY_PAIR_ID:
+        assert False, 'Please provide CLOUDFRONT_PRIVATE_KEY and CLOUDFRONT_KEY_PAIR_ID in settings.py'
+
+    encoded_signature = _get_canned_policy(resource, PRIVATE_KEY, expires)
+    
+    response.set_cookie(
+        'CloudFront-Expires',
+        expires,
+        httponly=True,
+    )
+
+    response.set_cookie(
+        'CloudFront-Signature',
+        encoded_signature,
+        httponly=True,
+    )
+
+    response.set_cookie(
+        'CloudFront-Key-Pair-Id',
+        KEY_PAIR_ID,
+        httponly=True,
+    )
+    
+    return response

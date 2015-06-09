@@ -2,11 +2,11 @@ from setuptools import setup
 
 setup(
     name='django_cloudfront',
-    version='0.1',
-    description='cloudfront private content signing for django',
-    url='http://github.com/tzangms/django_cloudfront',
-    author='tzangms',
-    author_email='tzangms@gmail.com',
+    version='0.2',
+    description='Amazon CloudFront private content signing for Django',
+    url='http://github.com/korneevm/django_cloudfront',
+    author='tzangms,korneevm',
+    author_email='tzangms@gmail.com, korneevm@gmail.com',
     keywords='django cloudfront',
     classifiers=[
         "Programming Language :: Python",
